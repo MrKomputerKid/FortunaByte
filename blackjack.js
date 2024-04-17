@@ -22,7 +22,7 @@ const Discord = require('discord.js');
         } else {
           sum += hand.filter(card => card === 'A').length;
         }
-        return sum;
+        return sum.toString(); // Ensure that the value is converted to a string
       }
 
       // Function to deal initial cards
