@@ -50,51 +50,63 @@ module.exports = {
         .addField('Player Hand Value', calculateHandValue(playerHand))
         .addField('Dealer Hand', `${dealerHand[0]}, ?`);
 
-      const message = await sentMessage.edit({ embeds: [embed] });
-      await message.react('👊'); // Add hit reaction
-      await message.react('✋'); // Add stand reaction
+      try {
+        const message = await sentMessage.edit({ embeds: [embed] });
+        await message.react('👊'); // Add hit reaction
+        await message.react('✋'); // Add stand reaction
+      } catch (error) {
+        console.error('Error updating embed:', error);
+      }
 
       // Collect reactions
       const filter = (reaction, user) => ['👊', '✋'].includes(reaction.emoji.name) && user.id === interaction.user.id;
-      const collector = message.createReactionCollector({ filter, time: 60000 });
+      const collector = sentMessage.createReactionCollector({ filter, time: 60000 });
 
       collector.on('collect', async (reaction, user) => {
-        if (reaction.emoji.name === '👊') {
-          // Handle hit action
-          playerHand.push(getRandomCard());
-          await updateEmbed(sentMessage);
-          const playerHandValue = calculateHandValue(playerHand);
-          if (playerHandValue === 21) {
-            collector.stop('Blackjack');
-          } else if (playerHandValue > 21) {
-            collector.stop('Bust');
+        try {
+          if (reaction.emoji.name === '👊') {
+            // Handle hit action
+            playerHand.push(getRandomCard());
+            await updateEmbed(sentMessage);
+            const playerHandValue = calculateHandValue(playerHand);
+            if (playerHandValue === 21) {
+              collector.stop('Blackjack');
+            } else if (playerHandValue > 21) {
+              collector.stop('Bust');
+            }
+          } else if (reaction.emoji.name === '✋') {
+            // Handle stand action
+            collector.stop('Stand');
           }
-        } else if (reaction.emoji.name === '✋') {
-          // Handle stand action
-          collector.stop('Stand');
+        } catch (error) {
+          console.error('Error handling reaction:', error);
         }
       });
 
       collector.on('end', async (collected, reason) => {
-        if (reason === 'Bust') {
-          // Handle bust
-          await interaction.followUp('You busted! Dealer wins.');
-        } else if (reason === 'Stand') {
-          // Handle stand
-          await revealDealerHand();
-          const dealerHandValue = calculateHandValue(dealerHand);
-          while (dealerHandValue < 17) {
-            dealerHand.push(getRandomCard());
-            await updateEmbed(sentMessage);
+        try {
+          if (reason === 'Bust') {
+            // Handle bust
+            await interaction.followUp('You busted! Dealer wins.');
+          } else if (reason === 'Stand') {
+            // Handle stand
+            await revealDealerHand();
             const dealerHandValue = calculateHandValue(dealerHand);
+            while (dealerHandValue < 17) {
+              dealerHand.push(getRandomCard());
+              await updateEmbed(sentMessage);
+              const dealerHandValue = calculateHandValue(dealerHand);
+            }
+            determineWinner();
+          } else if (reason === 'Blackjack') {
+            // Handle blackjack
+            await interaction.followUp('Blackjack! You win!');
+          } else {
+            // Handle timeout
+            await interaction.followUp('You took too long to respond.');
           }
-          determineWinner();
-        } else if (reason === 'Blackjack') {
-          // Handle blackjack
-          await interaction.followUp('Blackjack! You win!');
-        } else {
-          // Handle timeout
-          await interaction.followUp('You took too long to respond.');
+        } catch (error) {
+          console.error('Error handling collector end:', error);
         }
       });
     }
@@ -108,24 +120,32 @@ module.exports = {
         .addField('Player Hand Value', calculateHandValue(playerHand))
         .addField('Dealer Hand', dealerHand.join(', '));
 
-      await interaction.editReply({ embeds: [embed] });
+      try {
+        await interaction.editReply({ embeds: [embed] });
+      } catch (error) {
+        console.error('Error revealing dealer hand:', error);
+      }
     }
 
     // Function to determine the winner
     async function determineWinner() {
-      const playerHandValue = calculateHandValue(playerHand);
-      const dealerHandValue = calculateHandValue(dealerHand);
+      try {
+        const playerHandValue = calculateHandValue(playerHand);
+        const dealerHandValue = calculateHandValue(dealerHand);
 
-      if (playerHandValue > 21) {
-        await interaction.followUp('You busted! Dealer wins.');
-      } else if (dealerHandValue > 21) {
-        await interaction.followUp('Dealer busted! You win.');
-      } else if (playerHandValue > dealerHandValue) {
-        await interaction.followUp('You win!');
-      } else if (playerHandValue < dealerHandValue) {
-        await interaction.followUp('Dealer wins.');
-      } else {
-        await interaction.followUp('It\'s a tie!');
+        if (playerHandValue > 21) {
+          await interaction.followUp('You busted! Dealer wins.');
+        } else if (dealerHandValue > 21) {
+          await interaction.followUp('Dealer busted! You win.');
+        } else if (playerHandValue > dealerHandValue) {
+          await interaction.followUp('You win!');
+        } else if (playerHandValue < dealerHandValue) {
+          await interaction.followUp('Dealer wins.');
+        } else {
+          await interaction.followUp('It\'s a tie!');
+        }
+      } catch (error) {
+        console.error('Error determining winner:', error);
       }
     }
 
@@ -140,9 +160,12 @@ module.exports = {
       .addField('Player Hand Value', calculateHandValue(playerHand))
       .addField('Dealer Hand', `${dealerHand[0]}, ?`);
 
-    const sentMessage = await interaction.reply({ embeds: [embed], fetchReply: true });
-
-    // Update embed with current game state
-    await updateEmbed(sentMessage);
+    try {
+      const sentMessage = await interaction.reply({ embeds: [embed], fetchReply: true });
+      // Update embed with current game state
+      await updateEmbed(sentMessage);
+    } catch (error) {
+      console.error('Error replying to interaction:', error);
+    }
   }
 };
