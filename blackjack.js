@@ -55,9 +55,9 @@ module.exports = {
       const embed = new Discord.MessageEmbed()
         .setColor('#0099ff')
         .setTitle('Blackjack')
-        .addFields('Player Hand', playerHand.join(', '))
-        .addFields('Player Hand Value', calculateHandValue(playerHand))
-        .addFields('Dealer Hand', `${dealerHand[0]}, ?`);
+        .addField('Player Hand', playerHand.join(', '))
+        .addField('Player Hand Value', calculateHandValue(playerHand))
+        .addField('Dealer Hand', `${dealerHand[0]}, ?`);
 
       try {
         const message = await sentMessage.edit({ embeds: [embed] });
@@ -125,9 +125,9 @@ module.exports = {
       const embed = new Discord.MessageEmbed()
         .setColor('#0099ff')
         .setTitle('Blackjack')
-        .addFields('Player Hand', playerHand.join(', '))
-        .addFields('Player Hand Value', calculateHandValue(playerHand))
-        .addFields('Dealer Hand', dealerHand.join(', '));
+        .addField('Player Hand', playerHand.join(', '))
+        .addField('Player Hand Value', calculateHandValue(playerHand))
+        .addField('Dealer Hand', dealerHand.join(', '));
 
       try {
         await interaction.editReply({ embeds: [embed] });
@@ -165,9 +165,9 @@ module.exports = {
     const embed = new Discord.MessageEmbed()
       .setColor('#0099ff')
       .setTitle('Blackjack')
-      .addFields('Player Hand', playerHand.join(', '))
-      .addFields('Player Hand Value', calculateHandValue(playerHand))
-      .addFields('Dealer Hand', `${dealerHand[0]}, ?`);
+      .addField('Player Hand', playerHand.join(', '))
+      .addField('Player Hand Value', calculateHandValue(playerHand))
+      .addField('Dealer Hand', `${dealerHand[0]}, ?`);
 
     try {
       const sentMessage = await interaction.reply({ embeds: [embed], fetchReply: true });
