@@ -1,17 +1,6 @@
-// blackjack.js
 const Discord = require('discord.js');
-
-// Global error handler
-process.on('uncaughtException', (err) => {
-  console.log('Uncaught Exception:', err);
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-  console.log('Unhandled Rejection:', reason);
-});
-
 module.exports = {
-  playBlackjack: async function(interaction) {
+  playBlackjack: async function(interaction, sentMessage, collector) {
     const playerHand = [];
     const dealerHand = [];
 
@@ -51,32 +40,38 @@ module.exports = {
     }
 
     // Function to create and update the embed
-    async function updateEmbed(sentMessage) {
+    async function updateEmbed(sentMessage, collector, playerHand, dealerHand) {
       const embed = new Discord.MessageEmbed()
         .setColor('#0099ff')
         .setTitle('Blackjack')
         .addField('Player Hand', playerHand.join(', '))
         .addField('Player Hand Value', calculateHandValue(playerHand))
-        .addField('Dealer Hand', `${dealerHand[0]}, ?`);
+        .addField('Dealer Hand', dealerHand[0] + ', ?');
 
-      try {
-        const message = await sentMessage.edit({ embeds: [embed] });
-        await message.react('👊'); // Add hit reaction
-        await message.react('✋'); // Add stand reaction
+        try {
+          const message = await sentMessage.edit({ embeds: [embed] });
+      
+          // Clear previous reactions
+          await message.reactions.removeAll();
+      
+          // Add new reactions
+          await message.react('👊'); // Add hit reaction
+          await message.react('✋'); // Add stand reaction
+      
+          // Set up reaction collector
+          const filter = (reaction, user) => ['👊', '✋'].includes(reaction.emoji.name) && user.id === interaction.user.id;
+          collector = message.createReactionCollector({ filter, time: 60000 });
+      
       } catch (error) {
         console.log('Error updating embed:', error);
       }
 
-      // Collect reactions
-      const filter = (reaction, user) => ['👊', '✋'].includes(reaction.emoji.name) && user.id === interaction.user.id;
-      const collector = await sentMessage.createReactionCollector({ filter, time: 60000 });
-      
       collector.on('collect', async (reaction, user) => {
         try {
           if (reaction.emoji.name === '👊') {
             // Handle hit action
             playerHand.push(getRandomCard());
-            await updateEmbed(sentMessage);
+            await updateEmbed(sentMessage, collector, playerHand, dealerHand);
             const playerHandValue = calculateHandValue(playerHand);
             if (playerHandValue === 21) {
               collector.stop('Blackjack');
@@ -103,7 +98,7 @@ module.exports = {
             const dealerHandValue = calculateHandValue(dealerHand);
             while (dealerHandValue < 17) {
               dealerHand.push(getRandomCard());
-              await updateEmbed(sentMessage);
+              await updateEmbed(sentMessage, collector, playerHand, dealerHand);
               const dealerHandValue = calculateHandValue(dealerHand);
             }
             determineWinner();
@@ -162,17 +157,18 @@ module.exports = {
     dealInitialCards();
 
     // Send initial embed
-    const embed = new Discord.MessageEmbed()
-      .setColor('#0099ff')
-      .setTitle('Blackjack')
-      .addField('Player Hand', playerHand.join(', '))
-      .addField('Player Hand Value', calculateHandValue(playerHand))
-      .addField('Dealer Hand', `${dealerHand[0]}, ?`);
-
     try {
+      // Send initial embed
+      const embed = new Discord.MessageEmbed()
+        .setColor('#0099ff')
+        .setTitle('Blackjack')
+        .addField('Player Hand', playerHand.join(', '))
+        .addField('Player Hand Value', calculateHandValue(playerHand))
+        .addField('Dealer Hand', `${dealerHand[0]}, ?`);
+
       const sentMessage = await interaction.reply({ embeds: [embed], fetchReply: true });
       // Update embed with current game state
-      await updateEmbed(sentMessage);
+      await updateEmbed(sentMessage, collector, playerHand, dealerHand, interaction);
     } catch (error) {
       console.log('Error replying to interaction:', error);
     }
