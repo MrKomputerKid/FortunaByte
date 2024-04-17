@@ -3,11 +3,11 @@ const Discord = require('discord.js');
 
 // Global error handler
 process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception:', err);
+  console.log('Uncaught Exception:', err);
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection:', reason);
+  console.log('Unhandled Rejection:', reason);
 });
 
 module.exports = {
@@ -64,7 +64,7 @@ module.exports = {
         await message.react('👊'); // Add hit reaction
         await message.react('✋'); // Add stand reaction
       } catch (error) {
-        console.error('Error updating embed:', error);
+        console.log('Error updating embed:', error);
       }
 
       // Collect reactions
@@ -88,7 +88,7 @@ module.exports = {
             collector.stop('Stand');
           }
         } catch (error) {
-          console.error('Error handling reaction:', error);
+          console.log('Error handling reaction:', error);
         }
       });
 
@@ -115,7 +115,7 @@ module.exports = {
             await interaction.followUp('You took too long to respond.');
           }
         } catch (error) {
-          console.error('Error handling collector end:', error);
+          console.log('Error handling collector end:', error);
         }
       });
     }
@@ -125,14 +125,14 @@ module.exports = {
       const embed = new Discord.MessageEmbed()
         .setColor('#0099ff')
         .setTitle('Blackjack')
-        .addField('Player Hand', playerHand.join(', '))
-        .addField('Player Hand Value', calculateHandValue(playerHand))
-        .addField('Dealer Hand', dealerHand.join(', '));
+        .addFields('Player Hand', playerHand.join(', '))
+        .addFields('Player Hand Value', calculateHandValue(playerHand))
+        .addFields('Dealer Hand', dealerHand.join(', '));
 
       try {
         await interaction.editReply({ embeds: [embed] });
       } catch (error) {
-        console.error('Error revealing dealer hand:', error);
+        console.log('Error revealing dealer hand:', error);
       }
     }
 
@@ -154,7 +154,7 @@ module.exports = {
           await interaction.followUp('It\'s a tie!');
         }
       } catch (error) {
-        console.error('Error determining winner:', error);
+        console.log('Error determining winner:', error);
       }
     }
 
@@ -165,16 +165,16 @@ module.exports = {
     const embed = new Discord.MessageEmbed()
       .setColor('#0099ff')
       .setTitle('Blackjack')
-      .addField('Player Hand', playerHand.join(', '))
-      .addField('Player Hand Value', calculateHandValue(playerHand))
-      .addField('Dealer Hand', `${dealerHand[0]}, ?`);
+      .addFields('Player Hand', playerHand.join(', '))
+      .addFields('Player Hand Value', calculateHandValue(playerHand))
+      .addFields('Dealer Hand', `${dealerHand[0]}, ?`);
 
     try {
       const sentMessage = await interaction.reply({ embeds: [embed], fetchReply: true });
       // Update embed with current game state
       await updateEmbed(sentMessage);
     } catch (error) {
-      console.error('Error replying to interaction:', error);
+      console.log('Error replying to interaction:', error);
     }
   }
 };
