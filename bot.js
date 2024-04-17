@@ -51,4 +51,7 @@ client.on('interactionCreate', async interaction => {
   }
 });
 
-client.login('DISCORD_BOT_TOKEN');
+// Retrieve bot token from environment variable
+const token = process.env.DISCORD_BOT_TOKEN;
+
+client.login(token);
