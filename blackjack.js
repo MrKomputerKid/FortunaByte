@@ -55,9 +55,9 @@ module.exports = {
       const embed = new Discord.MessageEmbed()
         .setColor('#0099ff')
         .setTitle('Blackjack')
-        .addField('Player Hand', playerHand.join(', '))
-        .addField('Player Hand Value', calculateHandValue(playerHand))
-        .addField('Dealer Hand', `${dealerHand[0]}, ?`);
+        .addFields('Player Hand', playerHand.join(', '))
+        .addFields('Player Hand Value', calculateHandValue(playerHand))
+        .addFields('Dealer Hand', `${dealerHand[0]}, ?`);
 
       try {
         const message = await sentMessage.edit({ embeds: [embed] });
