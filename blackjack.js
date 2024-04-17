@@ -1,6 +1,15 @@
 // blackjack.js
 const Discord = require('discord.js');
 
+// Global error handler
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection:', reason);
+});
+
 module.exports = {
   playBlackjack: async function(interaction) {
     const playerHand = [];
