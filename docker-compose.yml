@@ -1,0 +1,9 @@
+version: "3.8"
+services:
+  exodus2bot:
+    build: .
+    network_mode: host
+    volumes:
+      - /home/cwessel/fortunabyte-data/:/app/data
+    environment:
+      - DISCORD_BOT_TOKEN

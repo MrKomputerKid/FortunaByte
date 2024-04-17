@@ -1,0 +1,12 @@
+{
+    "name": "discord-casino-bot",
+    "version": "1.0.0",
+    "description": "A Discord bot for playing casino games like Blackjack, Roulette, and Poker.",
+    "main": "bot.js",
+    "scripts": {
+      "start": "node bot.js"
+    },
+    "dependencies": {
+      "discord.js": "^13.3.1"
+    }
+  }
