@@ -69,8 +69,8 @@ module.exports = {
 
       // Collect reactions
       const filter = (reaction, user) => ['👊', '✋'].includes(reaction.emoji.name) && user.id === interaction.user.id;
-      const collector = sentMessage.createReactionCollector({ filter, time: 60000 });
-
+      const collector = await sentMessage.createReactionCollector({ filter, time: 60000 });
+      
       collector.on('collect', async (reaction, user) => {
         try {
           if (reaction.emoji.name === '👊') {
