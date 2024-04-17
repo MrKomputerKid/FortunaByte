@@ -1,37 +1,37 @@
-// bot.js
 const { Client, Intents } = require('discord.js');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+
+const guildId = process.env.DISCORD_GUILD_ID;
+
+client.once('ready', async () => {
+  try {
+    const commands = [
+      {
+        name: 'blackjack',
+        description: 'Play Blackjack'
+      },
+      {
+        name: 'roulette',
+        description: 'Play Roulette'
+      },
+      {
+        name: 'poker',
+        description: 'Play Poker'
+      }
+    ];
+
+    const guild = await client.guilds.fetch(guildId);
+    await guild.commands.set(commands);
+
+    console.log('Slash commands registered successfully!');
+  } catch (error) {
+    console.error('Error registering slash commands:', error);
+  }
+});
 
 const blackjack = require('./blackjack');
 const roulette = require('./roulette');
 const poker = require('./poker');
-
-// Register slash commands
-client.once('ready', async () => {
-    try {
-      const commands = [
-        {
-          name: 'blackjack',
-          description: 'Play Blackjack'
-        },
-        {
-          name: 'roulette',
-          description: 'Play Roulette'
-        },
-        {
-          name: 'poker',
-          description: 'Play Poker'
-        }
-      ];
-  
-      const guild = await client.guilds.fetch('YOUR_GUILD_ID');
-      await guild.commands.set(commands);
-      
-      console.log('Slash commands registered successfully!');
-    } catch (error) {
-      console.error('Error registering slash commands:', error);
-    }
-  });
 
 client.once('ready', () => {
   console.log('Ready!');
