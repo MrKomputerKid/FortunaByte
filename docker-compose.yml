@@ -2,9 +2,11 @@ version: "3.8"
 services:
   fortunabytebot:
     build: .
+    name: fortunabyte
+    restart: always
     network_mode: host
     volumes:
-      - /home/cwessel/fortunabyte-data:/app/data
+      - /home/cwessel/fortunabyte/fortunabyte-data:/app/data
     environment:
       - DISCORD_BOT_TOKEN
       - DISCORD_GUILD_ID
